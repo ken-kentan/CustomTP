@@ -2,6 +2,7 @@ package jp.kentan.minecraft.tp;
 
 import java.util.Calendar;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -10,8 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomTP extends JavaPlugin {
-	private int tp_number_ctp = -1,
-			    minute = -1;
+	private int tp_number_ctp = -1, minute = -1;
 
 	@Override
 	public void onEnable() {
@@ -55,14 +55,14 @@ public class CustomTP extends JavaPlugin {
 		case "ctp":
 			if ((sender instanceof Player)) {
 				Calendar now = Calendar.getInstance();
-				
-				//Init
+
+				// Init
 				if (tp_number_ctp == -1) {
 					tp_number_ctp = 0;
 					minute = now.get(now.MINUTE);
 				}
-				
-				if(now.get(now.MINUTE) - minute > 5 || now.get(now.MINUTE) - minute < 0){
+
+				if (now.get(now.MINUTE) - minute > 5 || now.get(now.MINUTE) - minute < 0) {
 					minute = now.get(now.MINUTE);
 					tp_number_ctp++;
 				}
@@ -82,6 +82,12 @@ public class CustomTP extends JavaPlugin {
 					return false;
 				}
 
+				Player other = getPlayer(args[0]);
+				if (other == null) {
+					sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです！");
+					return false;
+				}
+
 				player.teleport(tplocset1);
 
 			} else {
@@ -96,6 +102,15 @@ public class CustomTP extends JavaPlugin {
 	public void doError(CommandSender _sender, Exception _e) {
 		_sender.sendMessage(ChatColor.RED + "コマンドを正常に実行できませんでした");
 		getLogger().info(_e.toString());
+	}
+	
+	private Player getPlayer(String name) {
+	    for ( Player player : Bukkit.getOnlinePlayers() ) {
+	        if ( player.getName().equals(name) ) {
+	            return player;
+	        }
+	    }
+	    return null;
 	}
 
 }
