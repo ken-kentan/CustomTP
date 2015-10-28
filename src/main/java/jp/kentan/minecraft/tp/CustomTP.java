@@ -82,14 +82,16 @@ public class CustomTP extends JavaPlugin {
 					return false;
 				}
 
-				Player other = getPlayer(args[0]);
-				if (other == null) {
-					sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです！");
-					return false;
+				if (args.length != 0) {
+					Player other = getPlayer(args[0]);
+					if (other == null) {
+						sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです");
+						return false;
+					}
+					other.teleport(tplocset1);
+				} else {
+					player.teleport(tplocset1);
 				}
-
-				player.teleport(tplocset1);
-
 			} else {
 				sender.sendMessage(ChatColor.RED + "ゲーム内から実行してください");
 				return false;
@@ -103,14 +105,14 @@ public class CustomTP extends JavaPlugin {
 		_sender.sendMessage(ChatColor.RED + "コマンドを正常に実行できませんでした");
 		getLogger().info(_e.toString());
 	}
-	
+
 	private Player getPlayer(String name) {
-	    for ( Player player : Bukkit.getOnlinePlayers() ) {
-	        if ( player.getName().equals(name) ) {
-	            return player;
-	        }
-	    }
-	    return null;
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getName().equals(name)) {
+				return player;
+			}
+		}
+		return null;
 	}
 
 }
