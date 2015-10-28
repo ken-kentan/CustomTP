@@ -15,12 +15,12 @@ public class CustomTP extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		getLogger().info("CustomTPが有効化しました");
+		getLogger().info("CustomTPを有効化しました");
 	}
 
 	@Override
 	public void onDisable() {
-		getLogger().info("CustomTPが無効化しました");
+		getLogger().info("CustomTPを無効化しました");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -54,7 +54,7 @@ public class CustomTP extends JavaPlugin {
 			break;
 		case "ctp":
 			if ((sender instanceof Player)) {
-				Calendar now = Calendar.getInstance(); // インスタンス化
+				Calendar now = Calendar.getInstance();
 				
 				//Init
 				if (tp_number_ctp == -1) {
