@@ -1,0 +1,17 @@
+name: CustomTP
+main: jp.kentan.minecraft.tp.CustomTP
+version: 0.0.1
+author: ken_kentan
+website: http://ken.kentan.jp
+
+commands:
+    stp:
+        description: TPを設定します
+        usage: /stp 数字(0~9)
+        permission: jp.kentan.minecraft.tp
+        permission-message: You don't have <permission>
+    ctp:
+        description: 設定した場所にTPします
+        usage: /<command>
+        permission: jp.kentan.minecraft.tp
+        permission-message: You don't have <permission>
