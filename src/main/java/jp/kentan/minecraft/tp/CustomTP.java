@@ -30,7 +30,25 @@ public class CustomTP extends JavaPlugin {
 
 		switch (cmd.getName()) {
 		case "stp":
-			if (args[0] == "time") {
+			String s_time = "time";
+			if (args[0].equals(s_time)) {
+
+				if (args.length == 1) {
+					sender.sendMessage(ChatColor.RED + "時間（分）を入力してください");
+					return false;
+				}
+
+				int r_time = Integer.parseInt(args[1]);
+				
+				if(r_time < 0 || r_time > 60){
+					sender.sendMessage(ChatColor.RED + "時間（分）は0~60の間で設定してください");
+					return false;
+				}
+
+				getConfig().set("reload_time", r_time);
+				saveConfig();
+				
+				sender.sendMessage(ChatColor.AQUA + "更新時間を" + args[1] + "分に設定しました");
 
 			} else {
 				int tp_number;
@@ -72,7 +90,8 @@ public class CustomTP extends JavaPlugin {
 					minute = now.get(now.MINUTE);
 				}
 
-				if (now.get(now.MINUTE) - minute > 5
+				if (now.get(now.MINUTE) - minute > getConfig().getInt(
+						"reload_time")
 						|| now.get(now.MINUTE) - minute < 0) {
 					minute = now.get(now.MINUTE);
 					tp_number_ctp++;
@@ -122,7 +141,8 @@ public class CustomTP extends JavaPlugin {
 					minute = now.get(now.MINUTE);
 				}
 
-				if (now.get(now.MINUTE) - minute > 5
+				if (now.get(now.MINUTE) - minute > getConfig().getInt(
+						"reload_time")
 						|| now.get(now.MINUTE) - minute < 0) {
 					minute = now.get(now.MINUTE);
 					tp_number_ctp++;
