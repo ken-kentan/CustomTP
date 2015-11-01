@@ -53,7 +53,7 @@ public class CustomTP extends JavaPlugin {
 			sender.sendMessage(ChatColor.AQUA + "TP" + args[0] + "を設定しました");
 			break;
 		case "ctp":
-			if ((sender instanceof Player)) {
+			if ((sender instanceof Player) || args.length != 0) {
 				Calendar now = Calendar.getInstance();
 
 				// Init
@@ -72,6 +72,21 @@ public class CustomTP extends JavaPlugin {
 				else if (tp_number_ctp > 9)
 					tp_number_ctp = 0;
 
+				if (args.length != 0) {
+
+					try {
+						player = getPlayer(args[0]);
+					} catch (Exception e) {
+						doError(sender, e);
+						return false;
+					}
+
+					if (player == null) {
+						sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです");
+						return false;
+					}
+				}
+
 				Location tplocset1 = player.getLocation();
 				tplocset1.setX(getConfig().getDouble("at.X" + tp_number_ctp));
 				tplocset1.setY(getConfig().getDouble("at.Y" + tp_number_ctp));
@@ -82,23 +97,16 @@ public class CustomTP extends JavaPlugin {
 					return false;
 				}
 
-				if (args.length != 0) {
-					Player other = getPlayer(args[0]);
-					if (other == null) {
-						sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです");
-						return false;
-					}
-					other.teleport(tplocset1);
-				} else {
-					player.teleport(tplocset1);
-				}
+				player.teleport(tplocset1);
+
 			} else {
-				sender.sendMessage(ChatColor.RED + "ゲーム内から実行してください");
+				sender.sendMessage(ChatColor.RED + "ゲーム内から実行するか、TP対象のプレイヤーを指定してください");
 				return false;
 			}
 			break;
 		}
 		return true;
+
 	}
 
 	public void doError(CommandSender _sender, Exception _e) {
