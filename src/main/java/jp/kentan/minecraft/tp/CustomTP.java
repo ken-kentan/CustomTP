@@ -11,7 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomTP extends JavaPlugin {
-	private int tp_number_ctp = -1, minute = -1;
+	private int tp_number_ctp = -1,
+                minute = -1;
 
 	@Override
 	public void onEnable() {
@@ -23,31 +24,36 @@ public class CustomTP extends JavaPlugin {
 		getLogger().info("CustomTPを無効化しました");
 	}
 
-	public boolean onCommand(CommandSender sender, Command cmd,
-			String commandLabel, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 
 		Player player = null;
 
 		switch (cmd.getName()) {
 		case "stp":
-			String s_time = "time";
-			if (args[0].equals(s_time)) {
+			if (args[0].equals("time")) {
+				int r_time = 0;
 
 				if (args.length == 1) {
 					sender.sendMessage(ChatColor.RED + "時間（分）を入力してください");
 					return false;
 				}
-
-				int r_time = Integer.parseInt(args[1]);
 				
-				if(r_time < 0 || r_time > 60){
+				try {
+					r_time = Integer.parseInt(args[1]);
+				} catch (NumberFormatException nfex) {
+					sender.sendMessage(ChatColor.RED + "時間を正しく入力してください");
+					doError(sender, nfex);
+					return false;
+				}
+
+				if (r_time < 0 || r_time > 60) {
 					sender.sendMessage(ChatColor.RED + "時間（分）は0~60の間で設定してください");
 					return false;
 				}
 
 				getConfig().set("reload_time", r_time);
 				saveConfig();
-				
+
 				sender.sendMessage(ChatColor.AQUA + "更新時間を" + args[1] + "分に設定しました");
 
 			} else {
@@ -65,8 +71,7 @@ public class CustomTP extends JavaPlugin {
 
 				if (tp_number < 0 || tp_number > 9) {
 					sender.sendMessage(ChatColor.RED + "TPナンバーは0〜9で入力してください");
-					sender.sendMessage(ChatColor.RED + "コマンドを正常に実行できませんでした");
-					return false;
+					return true;
 				}
 
 				Location tplocset = player.getLocation();
@@ -79,52 +84,17 @@ public class CustomTP extends JavaPlugin {
 			}
 			break;
 		case "ctp":
+
+			if ((sender instanceof Player) == false && args.length == 0) {
+				sender.sendMessage(ChatColor.RED + "ゲーム内から実行するか、TP対象のプレイヤーを指定してください");
+				return false;
+			}
+
 			Calendar now = Calendar.getInstance();
 
-			if ((sender instanceof Player)) {
-				player = (Player) sender;// get player of do command
-
-				// Init
-				if (tp_number_ctp == -1) {
-					tp_number_ctp = 0;
-					minute = now.get(now.MINUTE);
-				}
-
-				if (now.get(now.MINUTE) - minute > getConfig().getInt(
-						"reload_time")
-						|| now.get(now.MINUTE) - minute < 0) {
-					minute = now.get(now.MINUTE);
-					tp_number_ctp++;
-				}
-
-				if (tp_number_ctp < 0)
-					tp_number_ctp = 9;
-				else if (tp_number_ctp > 9)
-					tp_number_ctp = 0;
-
-				Location tplocset1 = player.getLocation();
-				tplocset1.setX(getConfig().getDouble("at.X" + tp_number_ctp));
-				tplocset1.setY(getConfig().getDouble("at.Y" + tp_number_ctp));
-				tplocset1.setZ(getConfig().getDouble("at.Z" + tp_number_ctp));
-
-				if (tplocset1 == null) {
-					sender.sendMessage(ChatColor.RED + "TP" + tp_number_ctp
-							+ "が設定されていません");
-					return false;
-				}
-
-				player.teleport(tplocset1);
-
-			} else if (args.length != 0) { // if console
-
-				if (args.length > 1) {
-					sender.sendMessage(ChatColor.RED + "ユーザーは1名のみ指定可能です");
-					return false;
-				}
-
+			if (args.length != 0) {
 				try {
 					player = getPlayer(args[0]);
-
 				} catch (Exception e) {
 					doError(sender, e);
 					return false;
@@ -132,49 +102,43 @@ public class CustomTP extends JavaPlugin {
 
 				if (player == null) {
 					sender.sendMessage(ChatColor.RED + args[0] + "さんはオフラインです");
-					return false;
+					return true;
 				}
-
-				// Init
-				if (tp_number_ctp == -1) {
-					tp_number_ctp = 0;
-					minute = now.get(now.MINUTE);
-				}
-
-				if (now.get(now.MINUTE) - minute > getConfig().getInt(
-						"reload_time")
-						|| now.get(now.MINUTE) - minute < 0) {
-					minute = now.get(now.MINUTE);
-					tp_number_ctp++;
-				}
-
-				if (tp_number_ctp < 0)
-					tp_number_ctp = 9;
-				else if (tp_number_ctp > 9)
-					tp_number_ctp = 0;
-
-				Location tplocset1 = player.getLocation();
-				tplocset1.setX(getConfig().getDouble("at.X" + tp_number_ctp));
-				tplocset1.setY(getConfig().getDouble("at.Y" + tp_number_ctp));
-				tplocset1.setZ(getConfig().getDouble("at.Z" + tp_number_ctp));
-
-				if (tplocset1 == null) {
-					sender.sendMessage(ChatColor.RED + "TP" + tp_number_ctp
-							+ "が設定されていません");
-					return false;
-				}
-
-				player.teleport(tplocset1);
-
-			} else if (args.length > 1) {
-				sender.sendMessage(ChatColor.RED + "ユーザーは一人のみ指定して下しさい");
-				return false;
-
-			} else {
-				sender.sendMessage(ChatColor.RED
-						+ "ゲーム内から実行するか、TP対象のプレイヤーを指定してください");
-				return false;
+			} else if ((sender instanceof Player)) {
+				player = (Player) sender;// get player of do command
 			}
+
+			// Init
+			if (tp_number_ctp == -1) {
+				tp_number_ctp = 0;
+				minute = now.get(now.MINUTE);
+			}
+
+			if (now.get(now.MINUTE) - minute > getConfig().getInt("reload_time") - 1
+					|| now.get(now.MINUTE) - minute < 0) {
+				minute = now.get(now.MINUTE);
+				tp_number_ctp++;
+			}
+
+			if (tp_number_ctp < 0)
+				tp_number_ctp = 9;
+			else if (tp_number_ctp > 9)
+				tp_number_ctp = 0;
+
+			Location tplocset1 = player.getLocation();
+			tplocset1.setX(getConfig().getDouble("at.X" + tp_number_ctp));
+			tplocset1.setY(getConfig().getDouble("at.Y" + tp_number_ctp));
+			tplocset1.setZ(getConfig().getDouble("at.Z" + tp_number_ctp));
+
+			if (tplocset1 == null) {
+				sender.sendMessage(ChatColor.RED + "TP" + tp_number_ctp + "が設定されていません");
+				return true;
+			}
+
+			player.teleport(tplocset1);
+			
+			getLogger().info(player.toString() + "をTP" + tp_number_ctp + "にTPしました");
+
 			break;
 		}
 		return true;
